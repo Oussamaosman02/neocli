@@ -17,9 +17,10 @@ También puedes ejecutar el siguiente comando:
 wget https://github.com/Oussamaosman02/neocli/releases/download/v1.0/neocli
 ```
 
-Una vez descargado, habrá que moverlo a los binarios del usuario para poder usarlo en cualquier lado de la terminal:
+Una vez descargado, habrá que darle permisos y moverlo a los binarios del usuario para poder usarlo en cualquier lado de la terminal:
 
 ```bash
+chmod +x /carpeta/de/descarga/neocli
 sudo mv /carpeta/de/descarga/neocli /usr/bin
 ```
 
