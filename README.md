@@ -8,13 +8,13 @@ Esta CLI (Command Line Interface) hecha con Rust hace uso de la poderosa intelig
 
 ## Instalación
 
-> La versión 1.0 está actualmente solo para Linux
+> La versión 1.1 está actualmente solo para Linux
 
 Puedes ir al apartado **Releases** de este repositorio y descargarlo manualmente.
 También puedes ejecutar el siguiente comando:
 
 ```bash
-wget https://github.com/Oussamaosman02/neocli/releases/download/v1.0/neocli
+wget https://github.com/Oussamaosman02/neocli/releases/download/v1.1/neocli
 ```
 
 Una vez descargado, habrá que darle permisos y moverlo a los binarios del usuario para poder usarlo en cualquier lado de la terminal:
@@ -45,6 +45,12 @@ AHora ya puedes usar `neocli`:
 ```bash
 neocli Hola
 ```
+
+## `v1.1`
+
+En esta versión, añadimos un nuevo crate y quitamos las otras dependencias.
+
+¡Ahora usamos [davinci](https://crates.io/crates/davinci)!
 
 ## Uso
 

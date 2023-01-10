@@ -1,141 +1,38 @@
-use reqwest::{Client, Error, Response};
-
-use serde::{Deserialize, Serialize};
+use davinci::davinci;
 use std::env;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Parameters {
-    model: String,
-    prompt: String,
-    temperature: f64,
-    max_tokens: i32,
-    top_p: u8,
-    frequency_penalty: f64,
-    presence_penalty: f64,
-    stop: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Choice {
-    text: String,
-    index: u8,
-    logprobs: Option<i32>,
-    finish_reason: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Uso {
-    prompt_tokens: i32,
-    completion_tokens: i32,
-    total_tokens: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct OpenAIResponse {
-    id: String,
-    object: String,
-    created: u64,
-    model: String,
-    choices: Vec<Choice>,
-    usage: Uso,
-}
-fn some() {
-    let messi = OpenAIResponse {
-        id: String::from("cmpl-6UblIybqghmJKD2OSIzM9HEEMNUau"),
-        object: String::from("text_completion"),
-        created: 1672753016,
-        model: String::from("text-davinci-003"),
-        choices: vec![Choice {
-            text: String::from("Hi"),
-            index: 0,
-            logprobs: Some(9),
-            finish_reason: String::from("Stop"),
-        }],
-        usage: Uso {
-            prompt_tokens: 1,
-            completion_tokens: 1,
-            total_tokens: 1,
-        },
-    };
-
-    assert_eq!(messi.id, "cmpl-6UblIybqghmJKD2OSIzM9HEEMNUau");
-    assert_eq!(messi.object, "text_completion");
-    assert_eq!(messi.created, 1672753016);
-    assert_eq!(messi.model, "text-davinci-003");
-    assert_eq!(messi.choices[0].finish_reason, "Stop");
-    assert_eq!(messi.choices[0].index, 0);
-    assert_eq!(messi.choices[0].logprobs, Some(9));
-    assert_eq!(messi.usage.completion_tokens, 1);
-    assert_eq!(messi.usage.total_tokens, 1);
-    assert_eq!(messi.usage.prompt_tokens, 1);
-}
-#[tokio::main]
-async fn main() -> Result<(), Error> {
-    let tokenf = env::var("AI_TOKEN");
+fn main() {
+    // Reads the OpenAi API from enviroment variables
+    let token_exists = env::var("AI_TOKEN");
     let token;
-    match tokenf {
+    match token_exists {
         Ok(t) => token = t,
-        Err(e) => panic!("{}", e),
+        Err(e) => panic!("API token does not exist as AI_TOKEN env variable: {}", e),
     };
-    let texto = String::from("Bearer ") + &token;
+
+    // Read arguments
     let mut args: Vec<String> = env::args().collect();
-
     args.remove(0);
-    let respx: String = args.join(" ");
-    if respx.len() > 1 {
-        let respu: String = format!(
-        "Seguidamente, una conversación con un asistente de IA. Es útil, creativo, eficaz.\nHumano: {}.\nIA:",
-        respx
-    );
-        let prompt = Parameters {
-            model: String::from("text-davinci-003"),
-            prompt: respu,
-            temperature: 0.9,
-            max_tokens: 1024,
-            top_p: 1,
-            frequency_penalty: 0.0,
-            presence_penalty: 0.6,
-            stop: vec![String::from("\n")],
-        };
+    let query: String = args.join(" ");
 
-        let client = Client::new();
-        let resp: Response = client
-            .post("https://api.openai.com/v1/completions")
-            .header("Content-Type", "application/json")
-            .header("Authorization", texto)
-            .json(&prompt)
-            .send()
-            .await?;
+    // if arguments there are arguments
+    if query.len() > 1 {
+        // max. number of tokens
+        let max_tokens: i32 = 2048;
 
-        let openai_response: OpenAIResponse = match resp.json().await {
-            Ok(response) => response,
-            Err(error) => {
-                format!("{:#?}", error);
-                OpenAIResponse {
-                    id: String::from("cmpl-6UblIybqghmJKD2OSIzM9HEEMNUau"),
-                    object: String::from("text_completion"),
-                    created: 1672753016,
-                    model: String::from("text-davinci-003"),
-                    choices: vec![Choice {
-                        text: String::from(
-                            "Ni idea...Reformula la pregunta y vuelve a intentarlo!",
-                        ),
-                        index: 0,
-                        logprobs: Some(9),
-                        finish_reason: String::from("Stop"),
-                    }],
-                    usage: Uso {
-                        prompt_tokens: 1,
-                        completion_tokens: 0,
-                        total_tokens: 1,
-                    },
-                }
-            }
+        // declaring context
+        let context: String = String::from(
+            "Seguidamente, una conversación con un asistente de IA. Es útil, creativo y eficaz.",
+        );
+
+        // Passing arguments to davinci
+        let response: String = match davinci(token, context, query, max_tokens) {
+            Ok(res) => res,
+            Err(error) => error.to_string(),
         };
-        let final_resp = format!("{}", openai_response.choices[0].text);
-        println!("{}", final_resp);
+        println!("{}", response);
     } else {
-        let respuesta = format!(
+        let response = format!(
             "{} \n{} \n{} \n{} \n{}",
             "Soy una CLI (Command Line Interface) con una IA integrada (GPT-3).",
             "Dime tus preguntas y te las intentaré resolver!",
@@ -143,9 +40,6 @@ async fn main() -> Result<(), Error> {
             "  neocli \"¿Para que sirve grep?\"",
             "  neocli ¿Para que sirve grep?"
         );
-        println!("{}", respuesta);
+        println!("{}", response);
     }
-    some();
-
-    Ok(())
 }

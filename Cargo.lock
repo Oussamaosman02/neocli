@@ -61,6 +61,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
+name = "davinci"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c50925e6ad700520c24ba5f01268bf4ba86ad80a36a5bca11f93739a88b52f6"
+dependencies = [
+ "reqwest",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "encoding_rs"
 version = "0.8.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -377,11 +388,9 @@ dependencies = [
 
 [[package]]
 name = "neocli"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
- "reqwest",
- "serde",
- "tokio",
+ "davinci",
 ]
 
 [[package]]
